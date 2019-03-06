@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const logger = require("morgan");
+const path = require('path');
 
 const API_PORT = 3001;
 const app = express();
@@ -27,14 +28,20 @@ myEmitter.on('subscribeToTimer', function (a, b) {
 
 // (optional) only made for logging and
 // bodyParser, parses the request body to be a readable json format
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(logger("dev"));
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
+// app.use(logger("dev"));
+app.use(express.static(path.join(__dirname, 'client/build')));
+
+
 
 // this is our get method
 // this method fetches all available data in our database
-router.get("/getData", (req, res) => {
-
+router.get("/api/teste", (req, res) => {
+    return res.json({
+        success: true,
+        data: data
+    });
     // Data.find((err, data) => {
     //     if (err) return res.json({ success: false, error: err });
     //     return res.json({ success: true, data: data });
@@ -63,7 +70,7 @@ router.delete("/deleteData", (req, res) => {
 
 // this is our create methid
 // this method adds new data in our database
-router.post("/putData", (req, res) => {
+router.post("/api/putData", (req, res) => {
         var javascriptObject = 'oiii';
 
         io.emit("someName", javascriptObject);
@@ -103,6 +110,10 @@ router.post("/putData", (req, res) => {
 
 // append /api for our http requests
 app.use("/api", router);
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname + '/client/build/index.html'));
+});
 
 // launch our backend into a port
 app.listen(API_PORT, () => console.log(`LISTENING ON PORT ${API_PORT}`));
